@@ -1,41 +1,37 @@
 const fs = require("fs");
+const express = require("express");
+const app = express();
 
+const PORT = 8080;
 const createFile = fs.writeFileSync("./productos.json", "[]");
 const readFile = fs.readFileSync("./productos.json", "utf-8");
 const productList = JSON.parse(readFile);
-console.log(productList);
 let id = 1;
 
-const { response } = require("express");
-const express = require("express");
-const app = express();
-const PORT = 8080;
 
 const server = app.listen(PORT, () => {
   console.log(`App Express escuchando en el puerto ${server.address().port}`);
 });
 
-server.on(
-  "Error",
-  (
-    error // Para controlar errores
-  ) => console.log(`Ocurrió el siguiente error: ${error}`)
+server.on("Error", (error) =>
+  console.log(`Ocurrió el siguiente error: ${error}`) // Para controlar errores en el servidor
 );
 
 app.get("/", (request, response) => {
-  response.send('<h1 style="color:0000FF"> Bienvenidos al servidor Express </h1>');
+  response.send(
+    '<h1 style="color:0000"> Bienvenidos al servidor Express </h1>'
+  );
 });
 
-app.get("/products", (request, response) => {
-  response.send(productList.map(product => product.title));
+app.get("/Products", (request, response) => {
+  response.send(productList.map((product) => product.title));
 });
 
-app.get("/productRandom", (request, response) => {
-  let randomNumber = Math.floor(Math.random()*productList.length);
+app.get("/RandomProduct", (request, response) => {
+  let randomNumber = Math.floor(Math.random() * productList.length);
   let randomItem = productList[randomNumber];
   response.send(randomItem);
 });
-
 
 class Contenedor {
   constructor(title, price, thumbnail) {
@@ -51,7 +47,7 @@ class Contenedor {
     try {
       fs.writeFileSync("./productos.json", JSON.stringify(productList));
       console.log(
-        `Producto ${product.title} agregado con éxito, id: ${product.id}`
+        `Producto "${product.title}" agregado con éxito, id: ${product.id}`
       );
     } catch {
       console.log(`Ha ocurrido un error al sobreescribir el archivo JSON`);
@@ -94,7 +90,11 @@ class Contenedor {
   }
 }
 
-const exampleProduct = new Contenedor("Microondas", 100, "ImagenMicroondas.jpg");
+const exampleProduct = new Contenedor(
+  "Microondas",
+  100,
+  "ImagenMicroondas.jpg"
+);
 const exampleProduct2 = new Contenedor("Heladera", 200, "ImagenHeladera.jpg");
 const exampleProduct3 = new Contenedor("Notebook", 300, "ImagenNotebook.jpg");
 
