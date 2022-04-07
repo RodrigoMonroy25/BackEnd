@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Microondas",
+    "price": 100,
+    "thumbnail": "ImagenMicroondas.jpg",
+    "id": 1
+  },
+  {
+    "title": "Heladera",
+    "price": 200,
+    "thumbnail": "ImagenHeladera.jpg",
+    "id": 2
+  },
+  {
+    "title": "Notebook",
+    "price": 300,
+    "thumbnail": "ImagenNotebook.jpg",
+    "id": 3
+  }
+]

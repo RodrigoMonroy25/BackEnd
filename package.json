@@ -1,0 +1,15 @@
+{
+  "name": "mi-proyecto-backend",
+  "version": "1.0.0",
+  "description": "Mi proyecto BackEnd",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rodrigo Monroy",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.3",
+    "moment": "^2.29.1"
+  }
+}
