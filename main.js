@@ -37,36 +37,52 @@ class Contenedor {
 
   geyById(id) {
     let idToSearch = id - 1;
-    if (idToSearch <= productList.length) {
+    if (id > productList.length || id < 1) {
+      return console.log(`Ha ingresado un número fuera de rango`);
+    } else if (isNaN(id)) {
+      return console.log(`El carácter ingresado no es un número`);
+    } else if (productList[idToSearch] == null) {
+      console.log(`El id ${id} fue borrado`);
+    } else {
       let result = productList[idToSearch];
       console.log(result);
-    } else {
-      return console.log(`No se encontró el id ingresado`);
     }
   }
 
   getAll() {
-    return console.log(productList);
+    if (productList.length < 1) {
+      return console.log(`La lista de productos está vacía`);
+    } else {
+      return console.log(productList.map((product) => product.title));
+    }
   }
 
   deleteById(id) {
     let idToDelete = id - 1;
-    if (idToDelete <= productList.length) {
+    if (id > productList.length || id < 1) {
+      return console.log(`Ha ingresado un número fuera de rango`);
+    } else if (isNaN(id)) {
+      return console.log(`El carácter ingresado no es un número`);
+    } else if (productList[idToDelete] == null) {
+      console.log(`El id ${id} ya fue borrado anteriormente`);
+    } else {
       delete productList[idToDelete];
       fs.writeFileSync("./productos.json", JSON.stringify(productList));
       return console.log(`Se ha borrado el producto id ${id}`);
-    } else {
-      return console.log(`No se encontró el id ingresado`);
     }
   }
 
   deleteAll() {
-    try {
-      productList.splice(0, productList.length);
-      fs.writeFileSync("./productos.json", JSON.stringify(productList));
-      return console.log(`Se han borrado todos los productos de la lista`);
-    } catch {
-      console.log(`Ha ocurrido un error al borrar los productos de la lista`);
+    if (productList.length < 1) {
+      console.log(`La lista de productos está vacía`);
+    } else {
+      try {
+        productList.splice(0, productList.length);
+        fs.writeFileSync("./productos.json", JSON.stringify(productList));
+        return console.log(`Se han borrado todos los productos de la lista`);
+      } catch {
+        console.log(`Ha ocurrido un error al borrar los productos de la lista`);
+      }
     }
   }
 }
@@ -80,41 +96,51 @@ const server = app.listen(PORT, () => {
 server.on("Error", (error) =>
   console.log(`Ocurrió el siguiente error: ${error}`)
 );
-//
+
 app.get("/", (request, response) => {
   response.send(
     '<h1 style="color:0000"> Bienvenidos al servidor Express </h1>'
   );
 });
+
 app.get("/productos", (request, response) => {
-  response.json(productList.map((product) => product.title));
+  if (productList < 0) {
+    response.send(`La lista de productos está vacía`);
+  } else {
+    response.json(productList.map((product) => product.title));
+  }
 });
+
 app.get("/RandomProduct", (request, response) => {
-  let randomNumber = Math.round(Math.random() * productList.length);
-  let randomItem = productList[randomNumber];
-  response.json(randomItem);
+  if (productList.length < 1) {
+    response.send(`La lista de productos está vacía`);
+  } else {
+    let randomNumber = Math.round(Math.random() * productList.length);
+    let randomItem = productList[randomNumber];
+    response.json(randomItem);
+  }
 });
 
 router.get("/productos", (request, response) => {
-  if (productList.length > 1) {
+  if (productList.length < 1) {
+    response.send(`La lista de productos se encuentra vacía`);
+  } else {
     genericProduct.getAll();
     response.json(productList.map((product) => product.title));
-  } else {
-    response.send(`La lista de productos se encuentra vacía`);
   }
 });
 
 router.get("/productos/:id", (request, response) => {
-  let id = request.params.id - 1;
-  if (id >= productList.length || id < 0) {
+  let id = request.params.id;
+  if (id > productList.length || id < 1) {
     response.send("Ha ingresado un número fuera de rango");
   } else if (isNaN(id)) {
     response.send("El carácter ingresado no es un número");
-  } else if (productList[id] == null) {
-    response.send(`El id ${request.params.id} fue borrado, elija otro id`);
+  } else if (productList[id - 1] == null) {
+    response.send(`El id ${id} fue borrado, elija otro id`);
   } else {
-    genericProduct.geyById(request.params.id);
-    response.json(productList[id]);
+    genericProduct.geyById(id);
+    response.json(productList[id - 1]);
   }
 });
 
@@ -124,36 +150,30 @@ router.post("/productos", jsonParser, (request, response) => {
     request.body.price,
     request.body.thumbnail
   ); // !!! Modificar con HTML para agregar productos
-  if (productList) {
-    product.save(product);
-    response.json(productList);
-  } else {
-    const createFile = fs.writeFileSync("./productos.json", "[]");
-    const readFile = fs.readFileSync("./productos.json", "utf-8");
-    const productList = JSON.parse(readFile);
-    product.save(product);
-    response.json(productList);
-  }
+  product.save(product);
+  response.json(productList);
 });
 
 router.put("/productos/:id", jsonParser, (request, response) => {
-  let id = request.params.id - 1;
+  let id = request.params.id;
   let product = new Contenedor(
     request.body.title,
     request.body.price,
     request.body.thumbnail
   ); // !!! Modificar con HTML para agregar productos
-  if (id >= productList.length || id < 0) {
+  if (id > productList.length || id < 1) {
     response.send("Ha ingresado un número fuera de rango");
   } else if (isNaN(id)) {
     response.send("El carácter ingresado no es un número");
-  } else if (productList[id] == null) {
-    response.send(`El id ${request.params.id} fue borrado, no puede ser editado, elija otro id`);
+  } else if (productList[id - 1] == null) {
+    response.send(
+      `El id ${request.params.id} fue borrado, no puede ser editado, elija otro id`
+    );
   } else {
-    productList[id] = product;
-    productList[id].id = parseInt(request.params.id);
+    productList[id - 1] = product;
+    productList[id - 1].id = parseInt(id);
     console.log(
-      `El id ${request.params.id} fue sobreescrito con el producto "${product.title}"`
+      `El id ${id} fue sobreescrito con el producto "${product.title}"`
     );
     response.json(productList);
   }
@@ -161,8 +181,16 @@ router.put("/productos/:id", jsonParser, (request, response) => {
 
 router.delete("/productos/:id", (request, response) => {
   let id = request.params.id;
-  genericProduct.deleteById(id);
-  response.json(productList);
+  if (id > productList.length || id < 1) {
+    response.send("Ha ingresado un número fuera de rango");
+  } else if (isNaN(id)) {
+    response.send("El carácter ingresado no es un número");
+  } else if (productList[id - 1] == null) {
+    response.send(`El id ${request.params.id} ya fue borrado anteriormente`);
+  } else {
+    genericProduct.deleteById(id);
+    response.json(productList);
+  }
 });
 
 const exampleProduct = new Contenedor(
