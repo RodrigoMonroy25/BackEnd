@@ -12,7 +12,7 @@ app.engine(
   "hbs",
   handlebars.engine({
     extname: ".hbs",
-    defaultLayout: "index.hbs",
+    defaultLayout: "",
     layoutsDir: __dirname + "/views/layouts",
     partialsDir: __dirname + "/views/partials",
   })
@@ -113,7 +113,7 @@ router.get("/productos", (request, response) => {
     response.send(`La lista de productos se encuentra vacía`);
   } else {
     genericProduct.getAll();
-    response.render('./layouts/productList.hbs', {productList});
+    response.render("./layouts/productList.hbs", {productList});
   }
 });
 
@@ -132,14 +132,19 @@ router.get("/productos/:id", (request, response) => {
 });
 
 router.post("/productos", jsonParser, (request, response, next) => {
-  let product = new Contenedor(
-    request.title,
-    request.price,
-    request.thumbnail
-  );
-  console.log(product);
-  product.save(product);
-  next()
+  console.log(request.title);
+  if (request.title === undefined || request.price ===undefined || request.thumbnail === undefined){
+    response.render('./layouts/index', {product: false})
+  } else {
+    let product = new Contenedor(
+      request.title,
+      request.price,
+      request.thumbnail
+    );
+    console.log(product);
+    product.save(product);
+    response.render('./layouts/index')
+  }
 });
 
 router.put("/productos/:id", jsonParser, (request, response) => {

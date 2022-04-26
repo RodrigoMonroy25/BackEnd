@@ -7,9 +7,17 @@
     <h1>Mi proyecto BackEnd</h1>
     
     <div>
-        <h4 class="form-title">Lista de productos:</h4>    
+        <h4 class="form-title">Lista de productos:</h4>
+        <br>
+            {{#each productList}}
+              <p class="">{{this.id}}- {{this.title}}</p>
+            {{/each}}
     </div>
-
+    <br>
+    <br>
+    <div>
+      <button class="btn"><a href="/">Volver a pagina inicial</a></button>
+    </div>
     <footer>
       {{> footer}}
     </footer>
