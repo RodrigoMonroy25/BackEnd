@@ -1,14 +1,30 @@
 const fs = require("fs");
 const express = require("express");
-const { Router } = express;
 const app = express();
+const { Router } = express;
 const router = Router();
+app.use("/api", router);
+app.use(express.static("public"));
+app.use("/static", express.static(__dirname + "/public"));
+const multer = require("multer");
+const handlebars = require("express-handlebars");
+app.engine(
+  "hbs",
+  handlebars.engine({
+    extname: ".hbs",
+    defaultLayout: "index.hbs",
+    layoutsDir: __dirname + "/views/layouts",
+    partialsDir: __dirname + "/views/partials",
+  })
+);
+app.set("view engine", "hbs");
+app.set("views", "./views");
 const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
 //const urlencodedParser = bodyParser.urlencoded({ extended: false });
-app.use("/api", router);
 //app.use(express.json());
 //app.use(express.urlencoded({ extended: true }));
+
 
 const PORT = 8080;
 const createFile = fs.writeFileSync("./productos.json", "[]");
@@ -88,37 +104,8 @@ class Contenedor {
 }
 let genericProduct = new Contenedor("Product title", 0, "Thumbnail.jpg");
 
-// Se crea y configura el servidor para que escuche un determinado puerto
-const server = app.listen(PORT, () => {
-  console.log(`App Express escuchando en el puerto ${server.address().port}`);
-});
-// Función para el manejo de errores del servidor
-server.on("Error", (error) =>
-  console.log(`Ocurrió el siguiente error: ${error}`)
-);
-
 app.get("/", (request, response) => {
-  response.send(
-    '<h1 style="color:0000"> Bienvenidos al servidor Express </h1>'
-  );
-});
-
-app.get("/productos", (request, response) => {
-  if (productList < 0) {
-    response.send(`La lista de productos está vacía`);
-  } else {
-    response.json(productList.map((product) => product.title));
-  }
-});
-
-app.get("/RandomProduct", (request, response) => {
-  if (productList.length < 1) {
-    response.send(`La lista de productos está vacía`);
-  } else {
-    let randomNumber = Math.round(Math.random() * productList.length);
-    let randomItem = productList[randomNumber];
-    response.json(randomItem);
-  }
+  response.render('./layouts/index.hbs')
 });
 
 router.get("/productos", (request, response) => {
@@ -126,7 +113,7 @@ router.get("/productos", (request, response) => {
     response.send(`La lista de productos se encuentra vacía`);
   } else {
     genericProduct.getAll();
-    response.json(productList.map((product) => product.title));
+    response.render('./layouts/productList.hbs', {productList});
   }
 });
 
@@ -144,14 +131,15 @@ router.get("/productos/:id", (request, response) => {
   }
 });
 
-router.post("/productos", jsonParser, (request, response) => {
+router.post("/productos", jsonParser, (request, response, next) => {
   let product = new Contenedor(
-    request.body.title,
-    request.body.price,
-    request.body.thumbnail
-  ); // !!! Modificar con HTML para agregar productos
+    request.title,
+    request.price,
+    request.thumbnail
+  );
+  console.log(product);
   product.save(product);
-  response.json(productList);
+  next()
 });
 
 router.put("/productos/:id", jsonParser, (request, response) => {
@@ -193,14 +181,23 @@ router.delete("/productos/:id", (request, response) => {
   }
 });
 
-const exampleProduct = new Contenedor(
-  "Microondas",
-  100,
-  "ImagenMicroondas.jpg"
-);
+const exampleProduct = new Contenedor("Microondas", 100, "ImagenMicroondas.jpg");
 const exampleProduct2 = new Contenedor("Heladera", 200, "ImagenHeladera.jpg");
 const exampleProduct3 = new Contenedor("Notebook", 300, "ImagenNotebook.jpg");
 
 genericProduct.save(exampleProduct);
 genericProduct.save(exampleProduct2);
 genericProduct.save(exampleProduct3);
+
+
+
+
+
+// Se crea y configura el servidor para que escuche un determinado puerto
+const server = app.listen(PORT, () => {
+  console.log(`App Express escuchando en el puerto ${server.address().port}`);
+});
+// Función para el manejo de errores del servidor
+server.on("Error", (error) =>
+  console.log(`Ocurrió el siguiente error: ${error}`)
+);

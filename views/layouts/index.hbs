@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {{> head}}
+  </head>
+  <body class="container">
+    <h1>Mi proyecto BackEnd</h1>
+    
+    <div>
+        <h4 class="form-title">Formulario para carga de productos:</h4>    
+        <form action="/api/productos" enctype="multipart/form-data" class="form-body" method="post">
+            <label for="title">Título:</label>
+            <div>
+                <input type="text" name="title" id="title">
+            </div>
+            <label for="price">Precio:</label>
+            <div>
+                <input type="text" name="price" id="price">
+            </div>
+            <label for="thumbnail">Imagen:</label>
+            <div>
+                <input type="file" name="thumbnail" id="thumbnail">
+            </div>
+            <br>
+            <input type="submit" value="Cargar datos" href="/api/productos">
+        </form>
+    </div>
+<br>
+<br>
+    <div>
+      <button class="btn"><a href="/api/productos">Ver lista de productos</a></button>
+    </div>
+
+    <footer>
+      {{> footer}}
+    </footer>
+
+
+  </body>
+</html>
