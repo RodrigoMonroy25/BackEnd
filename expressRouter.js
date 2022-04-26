@@ -122,7 +122,7 @@ app.post('/uploadfile', upload.single('myFile'), (req, res, next) => {
   }
   res.send(file);
 }) 
-// Configurar una URL para subir varios archivo
+// Configurar una URL para subir varios archivos
 app.post('/uploadmultiple', upload.array('myFiles', 12), (req, res, next) => {
   const files = req.files;
   if (!files){

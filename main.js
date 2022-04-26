@@ -25,7 +25,6 @@ const jsonParser = bodyParser.json();
 //app.use(express.json());
 //app.use(express.urlencoded({ extended: true }));
 
-
 const PORT = 8080;
 const createFile = fs.writeFileSync("./productos.json", "[]");
 const readFile = fs.readFileSync("./productos.json", "utf-8");
@@ -105,7 +104,7 @@ class Contenedor {
 let genericProduct = new Contenedor("Product title", 0, "Thumbnail.jpg");
 
 app.get("/", (request, response) => {
-  response.render('./layouts/index.hbs')
+  response.render("./layouts/index.hbs");
 });
 
 router.get("/productos", (request, response) => {
@@ -113,7 +112,7 @@ router.get("/productos", (request, response) => {
     response.send(`La lista de productos se encuentra vacía`);
   } else {
     genericProduct.getAll();
-    response.render("./layouts/productList.hbs", {productList});
+    response.render("./layouts/productList.hbs", { productList });
   }
 });
 
@@ -132,19 +131,11 @@ router.get("/productos/:id", (request, response) => {
 });
 
 router.post("/productos", jsonParser, (request, response, next) => {
-  console.log(request.title);
-  if (request.title === undefined || request.price ===undefined || request.thumbnail === undefined){
-    response.render('./layouts/index', {product: false})
-  } else {
-    let product = new Contenedor(
-      request.title,
-      request.price,
-      request.thumbnail
-    );
-    console.log(product);
-    product.save(product);
-    response.render('./layouts/index')
-  }
+  let product = new Contenedor(request.title,
+    request.price,
+    request.thumbnail);
+  product.save(product);
+  response.render('./layouts/index.hbs')
 });
 
 router.put("/productos/:id", jsonParser, (request, response) => {
@@ -186,15 +177,19 @@ router.delete("/productos/:id", (request, response) => {
   }
 });
 
-const exampleProduct = new Contenedor("Microondas", 100, "ImagenMicroondas.jpg");
+
+
+const exampleProduct = new Contenedor(
+  "Microondas",
+  100,
+  "ImagenMicroondas.jpg"
+);
 const exampleProduct2 = new Contenedor("Heladera", 200, "ImagenHeladera.jpg");
 const exampleProduct3 = new Contenedor("Notebook", 300, "ImagenNotebook.jpg");
 
 genericProduct.save(exampleProduct);
 genericProduct.save(exampleProduct2);
 genericProduct.save(exampleProduct3);
-
-
 
 
 
