@@ -9,27 +9,57 @@
     <div>
         <h4 class="form-title">Formulario para carga de productos:</h4>
         <br>
-        <form action="/api/productos" enctype="multipart/form-data" class="form-body" method="post">
-            <div>
-                <label for="title">Título:</label>
-                <input type="text" name="title" id="title">
+        <form action="/api/productos" enctype="multipart/form-data" method="post">
+            <div class="form-group d-flex align-items-center flex-column">
+                <label for="title">Título:</label>  
+                <input type="text" name="title" id="title" class="form-control-sm">
             </div>
-            <div>
+            <div class="form-group d-flex align-items-center flex-column">
                 <label for="price">Precio:</label>
-                <input type="text" name="price" id="price">
+                <input type="text" name="price" id="price" class="form-control-sm">
             </div>
-            <div>
+            <div class="form-group d-flex align-items-center flex-column">
                 <label for="thumbnail">Imagen:</label>
                 <input type="file" name="thumbnail" id="thumbnail">
             </div>
             <br>
-            <input type="submit" value="Cargar datos" class="btn btn-primary">
+            <div class="d-flex justify-content-center">
+              <button type="submit" class="btn btn-primary">Cargar datos</button>
+            </div>
         </form>
     </div>
     <br>
+    <div id="lista-productos">
+      <h4 class="form-title">Lista de productos:</h4>
+      <br>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Título</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Imagen</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each productList}}
+            <tr>
+              <th scope="row"> {{this.id}} </th>
+              <td>{{this.title}}</td>
+              <td>{{this.price}}</td>
+              <td>{{this.image}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
     <br>
     <div>
       <button class="btn"><a href="/api/productos">Ver lista de productos</a></button>
+    </div>
+    <br>
+    <div>
+      {{> appChat}}
     </div>
 
     <footer>

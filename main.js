@@ -1,12 +1,20 @@
+// File System
 const fs = require("fs");
+
+// Express
 const express = require("express");
 const app = express();
+
+// Router
 const { Router } = express;
 const router = Router();
 app.use("/api", router);
+
+// Static
 app.use(express.static("public"));
 app.use("/static", express.static(__dirname + "/public"));
-const multer = require("multer");
+
+// HBS
 const handlebars = require("express-handlebars");
 app.engine(
   "hbs",
@@ -19,13 +27,35 @@ app.engine(
 );
 app.set("view engine", "hbs");
 app.set("views", "./views");
+
+// JSON
 const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
 //const urlencodedParser = bodyParser.urlencoded({ extended: false });
 //app.use(express.json());
 //app.use(express.urlencoded({ extended: true }));
 
-const PORT = 8080;
+// IO
+const { Server: HttpServer } = require('http');
+const { Server: IOServer} = require('socket.io');
+const httpServer = new HttpServer(app);
+const io = new IOServer(httpServer);
+
+io.on("connection", (socket) => {
+  console.log("Usuario conectado");
+  socket.emit("messages", messageList);
+
+  socket.on("notificacion", (data) => {
+    console.log(data);
+  });
+
+  socket.on("mensaje", (data) => {
+    messageList.push(data)
+    io.sockets.emit('messages', messageList)
+  });
+});
+
+// PRODUCTOS
 const createFile = fs.writeFileSync("./productos.json", "[]");
 const readFile = fs.readFileSync("./productos.json", "utf-8");
 const productList = JSON.parse(readFile);
@@ -103,8 +133,32 @@ class Contenedor {
 }
 let genericProduct = new Contenedor("Product title", 0, "Thumbnail.jpg");
 
+// CHAT
+const createMessageBox = fs.writeFileSync("./mensajes.json", "[]");
+const readMessageBox = fs.readFileSync("./mensajes.json", "utf-8");
+const messageList = JSON.parse(readMessageBox);
+class Mensajes {
+  constructor (user, message) {
+    this.user = user;
+    this.message = message;
+  }
+  save(message) {
+    messageList.push(message);
+    try {
+      fs.writeFileSync("./mensajes.json", JSON.stringify(messageList));
+      console.log(
+        `Chat - ${message.user}: ${message.message}`
+      );
+    } catch {
+      console.log(`Ha ocurrido un error al enviar el mensaje`);
+    }
+  }
+}
+let genericMessage = new Mensajes("Rodrigo Monroy", "Hola!!!");
+genericMessage.save(genericMessage);
+
 app.get("/", (request, response) => {
-  response.render("./layouts/index.hbs");
+  response.render("./layouts/index.hbs", { productList });
 });
 
 router.get("/productos", (request, response) => {
@@ -131,9 +185,7 @@ router.get("/productos/:id", (request, response) => {
 });
 
 router.post("/productos", jsonParser, (request, response, next) => {
-  let product = new Contenedor(request.title,
-    request.price,
-    request.thumbnail);
+  let product = new Contenedor(request.title, request.price, request.thumbnail);
   product.save(product);
   response.render('./layouts/index.hbs')
 });
@@ -194,6 +246,7 @@ genericProduct.save(exampleProduct3);
 
 
 // Se crea y configura el servidor para que escuche un determinado puerto
+const PORT = 8080;
 const server = app.listen(PORT, () => {
   console.log(`App Express escuchando en el puerto ${server.address().port}`);
 });

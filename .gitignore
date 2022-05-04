@@ -3,4 +3,5 @@
 /ejs2
 /handlebars
 /pug
+/websockets
 expressRouter.js

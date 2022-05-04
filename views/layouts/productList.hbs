@@ -7,11 +7,28 @@
     <h1>Mi proyecto BackEnd</h1>
     
     <div>
-        <h4 class="form-title">Lista de productos:</h4>
-        <br>
-            {{#each productList}}
-              <p class="">{{this.id}}- {{this.title}}</p>
-            {{/each}}
+      <h4 class="form-title">Lista de productos:</h4>
+      <br>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">Título</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Imagen</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each productList}}
+            <tr>
+              <th scope="row"> {{this.id}} </th>
+              <td>{{this.title}}</td>
+              <td>{{this.price}}</td>
+              <td>{{this.image}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
     </div>
     <br>
     <br>
